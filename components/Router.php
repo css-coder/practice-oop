@@ -4,29 +4,60 @@
     {
         private $routes;
 
+        /**
+         * Router constructor.
+         */
         public function __construct()
         {
             $routesPath = ROOT . '/config/routes.php';
             $this->routes = include($routesPath);
         }
 
+        /*
+         *  Returns request string
+         */
+        private function getURI()
+        {
+            if (!empty($_SERVER['REQUEST_URI'])) {
+                return trim($_SERVER['REQUEST_URI'], '/');
+            }
+        }
+
         public function run()
         {
             // Получить строку запроса
-
+            $uri = $this->getURI();
 
             // Проверить наличие запроса в routes.php
+            foreach ($this->routes as $uriPattern => $path) {
 
+                // Сравниваем $uriPattern & $uri
+                if (preg_match("~$uriPattern~", $uri)) {
 
-            // Если есть совпадение, определить какой контроллер
-            // и action обрабатывает запрос
+                    // Если есть совпадение, определить какой контроллер
+                    // и action обрабатывает запрос
+                    $segments = explode('/', $path);
 
+                    $controllerName = array_shift($segments) . 'Controller';
+                    $controllerName = ucfirst($controllerName);
 
-            // Подключить файл класса-контроллера
+                    $actionName = 'action' . ucfirst(array_shift($segments));
 
+                    // Подключить файл класса-контроллера
+                    $controllerFile = ROOT . '/controllers/' . $controllerName . '.php';
 
-            // Создать объект, вызвать метод (action)
+                    if (file_exists($controllerFile)) {
+                        include_once ($controllerFile);
+                    }
 
+                    // Создать объект, вызвать метод (action)
+                    $controllerObject = new $controllerName;
+                    $result = $controllerObject->$actionName();
+                    if ($result != NULL) {
+                        break;
+                    }
 
+                }
+            }
         }
     }
