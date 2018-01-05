@@ -15,3 +15,5 @@
 
 
     // Вызов Router
+    $router = new Router();
+    $router->run();
