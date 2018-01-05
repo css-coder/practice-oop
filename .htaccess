@@ -1,1 +1,5 @@
-         
+
+
+RewriteEngine on
+RewriteBase /
+RewriteRule ^(.*)$ index.php
