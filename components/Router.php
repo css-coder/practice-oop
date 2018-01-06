@@ -34,14 +34,23 @@
                 // Сравниваем $uriPattern & $uri
                 if (preg_match("~$uriPattern~", $uri)) {
 
+                    //echo 'Где ищем (запрос который набрал пользователь): ' . $uri;
+                    //echo '<br>Ищем совпадение из правил: ' . $uriPattern;
+                    //echo '<br>Что обрабатывает запрос: ' . $path . '<br>';
+
+                    // Получаем внутренний путь из внешнего согласно правилу
+                    $internalRoute = preg_replace("~$uriPattern~", $path, $uri);
+
                     // Если есть совпадение, определить какой контроллер
                     // и action обрабатывает запрос
-                    $segments = explode('/', $path);
+                    $segments = explode('/', $internalRoute);
 
                     $controllerName = array_shift($segments) . 'Controller';
                     $controllerName = ucfirst($controllerName);
 
                     $actionName = 'action' . ucfirst(array_shift($segments));
+
+                    $parameters = $segments;
 
                     // Подключить файл класса-контроллера
                     $controllerFile = ROOT . '/controllers/' . $controllerName . '.php';
@@ -52,7 +61,8 @@
 
                     // Создать объект, вызвать метод (action)
                     $controllerObject = new $controllerName;
-                    $result = $controllerObject->$actionName();
+                    $result = call_user_func_array(array($controllerObject, $actionName), $parameters);
+
                     if ($result != NULL) {
                         break;
                     }
