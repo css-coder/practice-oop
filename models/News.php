@@ -9,7 +9,7 @@
         {
             // Запрос к бд
             $db = Db::getConnection();
-            $result = $db->query('SELECT * FROM news WHERE id=' . $id);
+            $result = $db->query('SELECT * FROM publication WHERE id=' . $id);
 
             /*$result->setFetchMode(PDO::FETCH_NUM);*/
             $result->setFetchMode(PDO::FETCH_ASSOC);
@@ -29,12 +29,12 @@
             $db = Db::getConnection();
             $newsList = array();
 
-            $result = $db->query('SELECT id, title_h1, date, short_content FROM news ORDER BY id ASC LIMIT 10');
+            $result = $db->query('SELECT id, title, date, short_content FROM publication ORDER BY id ASC LIMIT 10');
 
             $i = 0;
             while($row = $result->fetch()) {
                 $newsList[$i]['id'] = $row['id'];
-                $newsList[$i]['title_h1'] = $row['title_h1'];
+                $newsList[$i]['title'] = $row['title'];
                 $newsList[$i]['date'] = $row['date'];
                 $newsList[$i]['short_content'] = $row['short_content'];
                 $i++;
